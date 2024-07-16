@@ -1,27 +1,27 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 
-export type UserDocument = HydratedDocument<User>;
+export type AddressDocument = HydratedDocument<Address>;
 
 @Schema()
-export class User {
+export class Address {
   @Prop()
   _id: string;
 
   @Prop()
-  userName: string;
+  street: string;
 
   @Prop()
-  email: string;
+  city: string;
 
   @Prop()
-  passwordHash: string;
+  state: string;
 
   @Prop()
-  mobileNumber: string;
+  postalCode: string;
 
   @Prop()
-  profilePictureUrl: string;
+  country: string;
 
   @Prop()
   createdAt: Date;
@@ -33,4 +33,4 @@ export class User {
   isDeleted: boolean;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const AddressSchema = SchemaFactory.createForClass(Address);
