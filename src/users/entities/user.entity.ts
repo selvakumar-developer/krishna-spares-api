@@ -20,6 +20,9 @@ export class User {
   @Field({ description: 'Profile picture URL of the user' })
   profilePictureUrl: string;
 
+  @Field({ description: 'Address of the user' })
+  address: string;
+
   @Field({ description: 'Created Date of the user' })
   createdAt: Date;
 
