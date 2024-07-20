@@ -6,9 +6,6 @@ export type AddressDocument = HydratedDocument<Address>;
 @Schema()
 export class Address {
   @Prop()
-  _id: string;
-
-  @Prop()
   street: string;
 
   @Prop()

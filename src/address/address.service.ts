@@ -1,15 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { CreateAddressInput } from './dto/create-address.input';
 import { UpdateAddressInput } from './dto/update-address.input';
+import { Address } from './entities/address.schema';
 
 @Injectable()
 export class AddressService {
-  create(createAddressInput: CreateAddressInput) {
-    return 'This action adds a new address';
+  constructor(
+    @InjectModel(Address.name) private addressModel: Model<Address>,
+  ) {}
+  async create(createAddressInput: CreateAddressInput) {
+    return await this.addressModel.create(createAddressInput);
   }
 
-  findAll() {
-    return `This action returns all address`;
+  async findAll() {
+    return await this.addressModel.find().exec();
   }
 
   findOne(id: number) {
@@ -17,6 +23,7 @@ export class AddressService {
   }
 
   update(id: number, updateAddressInput: UpdateAddressInput) {
+    console.log('updateAddressInput: ', updateAddressInput);
     return `This action updates a #${id} address`;
   }
 
