@@ -1,4 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
+import { CreateAddressInput } from 'src/address/dto/create-address.input';
 
 @InputType()
 export class CreateUserInput {
@@ -17,6 +18,6 @@ export class CreateUserInput {
   @Field({ description: 'Profile picture URL of the user' })
   profilePictureUrl: string;
 
-  @Field({ description: 'Address of the user' })
-  address: string;
+  @Field(() => CreateAddressInput, { description: 'Address of the user' })
+  address: CreateAddressInput;
 }
