@@ -1,14 +1,11 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Schema as MongooseSchema, Types } from 'mongoose';
 import { Address } from 'src/address/entities/address.entity';
 
 @ObjectType()
-@Schema()
+@Schema({ timestamps: true })
 export class User {
-  @Field(() => ID, { description: 'Unique identifier of the user' })
-  @Prop()
-  _id: string;
-
   @Field({ description: 'Name of the user' })
   @Prop()
   userName: string;
@@ -29,9 +26,9 @@ export class User {
   @Prop()
   profilePictureUrl: string;
 
-  @Field(() => Address, { description: 'Address of the user' })
-  @Prop()
-  address: string;
+  @Field(() => ID, { description: 'Address of the user' })
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: Address.name })
+  address: Types.ObjectId;
 
   @Field({ description: 'Created Date of the user' })
   @Prop()
@@ -50,3 +47,14 @@ export class User {
 
 export type UserDocument = User & Document;
 export const UserSchema = SchemaFactory.createForClass(User);
+
+UserSchema.pre(
+  'deleteOne',
+  { document: true, query: false },
+  async function () {
+    const user = this as User;
+    if (user.address) {
+      await this.model(Address.name).deleteOne({ _id: user.address }).exec();
+    }
+  },
+);

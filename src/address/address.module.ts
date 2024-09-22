@@ -9,5 +9,6 @@ import { Address, AddressSchema } from './entities/address.entity';
     MongooseModule.forFeature([{ name: Address.name, schema: AddressSchema }]),
   ],
   providers: [AddressResolver, AddressService],
+  exports: [AddressService],
 })
 export class AddressModule {}
