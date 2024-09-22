@@ -22,7 +22,7 @@ export class AddressService {
     return `This action returns a #${id} address`;
   }
 
-  update(id: number, updateAddressInput: UpdateAddressInput) {
+  update(id: string, updateAddressInput: UpdateAddressInput) {
     console.log('updateAddressInput: ', updateAddressInput);
     return `This action updates a #${id} address`;
   }

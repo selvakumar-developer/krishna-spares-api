@@ -1,13 +1,9 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @ObjectType()
-@Schema()
+@Schema({ timestamps: true })
 export class Address {
-  @Field(() => ID, { description: 'Unique identifier for the address' })
-  @Prop()
-  _id: string;
-
   @Field({ description: 'Street Name for the address' })
   @Prop()
   street: string;
