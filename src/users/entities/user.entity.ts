@@ -1,14 +1,41 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Schema as MongooseSchema, Types } from 'mongoose';
-import { Address } from 'src/address/entities/address.entity';
+import { Types } from 'mongoose';
+@ObjectType()
+class Address {
+  @Field({ description: 'Street Name for the address' })
+  @Prop()
+  street: string;
 
+  @Field({ description: 'City name for the address' })
+  @Prop()
+  city: string;
+
+  @Field({ description: 'State name for the address' })
+  @Prop()
+  state: string;
+
+  @Field({ description: 'Postal code for the address' })
+  @Prop()
+  postalCode: string;
+
+  @Field({ description: 'Country name for the address' })
+  @Prop()
+  country: string;
+
+  @Field({
+    description:
+      'To maintain whether the address is deleted or not (soft delete)',
+  })
+  @Prop()
+  isDeleted: boolean;
+}
 @ObjectType()
 @Schema({ timestamps: true })
 export class User {
   @Field({ description: 'Name of the user' })
   @Prop()
-  userName: string;
+  fullName: string;
 
   @Field({ description: 'Email of the user' })
   @Prop()
@@ -26,8 +53,8 @@ export class User {
   @Prop()
   profilePictureUrl: string;
 
-  @Field(() => ID, { description: 'Address of the user' })
-  @Prop({ type: MongooseSchema.Types.ObjectId, ref: Address.name })
+  @Field(() => [Address], { description: 'List of addresses of the user' })
+  @Prop({ type: [Address] })
   address: Types.ObjectId;
 
   @Field({ description: 'Created Date of the user' })
@@ -47,14 +74,3 @@ export class User {
 
 export type UserDocument = User & Document;
 export const UserSchema = SchemaFactory.createForClass(User);
-
-UserSchema.pre(
-  'deleteOne',
-  { document: true, query: false },
-  async function () {
-    const user = this as User;
-    if (user.address) {
-      await this.model(Address.name).deleteOne({ _id: user.address }).exec();
-    }
-  },
-);

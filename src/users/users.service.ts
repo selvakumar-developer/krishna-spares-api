@@ -7,29 +7,21 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
 import { Model, Types } from 'mongoose';
-import { AddressService } from 'src/address/address.service';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
-    private readonly addressService: AddressService,
-  ) {}
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async create(createUserInput: CreateUserInput) {
     try {
-      const createAddressResponse = await this.addressService.create(
-        createUserInput.address,
-      );
       const passwordHash = await bcrypt.hash(createUserInput.passwordHash, 10);
 
       const createUserResponse = await this.userModel.create({
         ...createUserInput,
         passwordHash,
-        address: new Types.ObjectId(createAddressResponse._id),
       });
       return createUserResponse;
     } catch (error) {
