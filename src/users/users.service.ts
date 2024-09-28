@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
-import { Model, Types } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
@@ -37,7 +37,7 @@ export class UsersService {
     }
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     try {
       const user = await this.userModel
         .findById(id)
@@ -45,6 +45,18 @@ export class UsersService {
         .exec();
       if (!user) {
         throw new NotFoundException(`User with ID "${id}" not found`);
+      }
+      return user;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  async findBy(filter: FilterQuery<User>) {
+    try {
+      const user = await this.userModel.findOne({ ...filter }).exec();
+      if (!user) {
+        throw new NotFoundException(`User not found`);
       }
       return user;
     } catch (error) {
