@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import configuration from './config/configuration';
 import { IAppConfig } from './interface/config';
 import { UsersModule } from './users/users.module';
+import { AdminUsersModule } from './admin-users/admin-users.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { UsersModule } from './users/users.module';
     }),
     UsersModule,
     AuthModule,
+    AdminUsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
