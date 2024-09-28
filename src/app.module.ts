@@ -9,11 +9,13 @@ import { UsersModule } from './users/users.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import configuration from './config/configuration';
 import { IAppConfig } from './interface/config';
+import { AdminUsersModule } from './admin-users/admin-users.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       load: [configuration],
+      isGlobal: true,
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -35,6 +37,7 @@ import { IAppConfig } from './interface/config';
       // },
     }),
     UsersModule,
+    AdminUsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
