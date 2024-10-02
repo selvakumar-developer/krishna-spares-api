@@ -1,5 +1,7 @@
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { AdminUsersService } from './admin-users.service';
+import { AdminSignInInput } from './dto/admin-sign-in-input';
+import { AdminSignInResponse } from './dto/admin-sign-in-response';
 import { CreateAdminUserInput } from './dto/create-admin-user.input';
 import { UpdateAdminUserInput } from './dto/update-admin-user.input';
 import { AdminUser } from './entities/admin-user.entity';
@@ -38,5 +40,10 @@ export class AdminUsersResolver {
   @Mutation(() => AdminUser)
   removeAdminUser(@Args('id') id: string) {
     return this.adminUsersService.remove(id);
+  }
+
+  @Mutation(() => AdminSignInResponse)
+  adminUserSignIn(@Args('adminUserSignIn') signInInput: AdminSignInInput) {
+    return this.adminUsersService.signIn(signInInput);
   }
 }
