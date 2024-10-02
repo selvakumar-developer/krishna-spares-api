@@ -1,12 +1,18 @@
 import {
+  HttpException,
+  HttpStatus,
   Injectable,
   Logger,
   NotFoundException,
   OnModuleInit,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { compareSync } from 'bcrypt';
+import { FilterQuery, Model } from 'mongoose';
+import { AdminSignInInput } from './dto/admin-sign-in-input';
 import { CreateAdminUserInput } from './dto/create-admin-user.input';
 import { UpdateAdminUserInput } from './dto/update-admin-user.input';
 import {
@@ -20,6 +26,7 @@ export class AdminUsersService implements OnModuleInit {
   constructor(
     @InjectModel(AdminUser.name) private adminUserModel: Model<AdminUser>,
     private configService: ConfigService,
+    private jwtService: JwtService,
   ) {}
 
   async onModuleInit() {
@@ -90,6 +97,18 @@ export class AdminUsersService implements OnModuleInit {
     return adminUser;
   }
 
+  async findBy(filter: FilterQuery<AdminUser>) {
+    try {
+      const user = await this.adminUserModel.findOne({ ...filter }).exec();
+      if (!user) {
+        throw new NotFoundException(`Admin user not found`);
+      }
+      return user;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.FORBIDDEN);
+    }
+  }
+
   async update(id: string, updateAdminUserInput: UpdateAdminUserInput) {
     const user = await this.get(id);
     Object.assign(user, updateAdminUserInput);
@@ -99,5 +118,23 @@ export class AdminUsersService implements OnModuleInit {
 
   remove(id: string) {
     return this.adminUserModel.findByIdAndDelete(id);
+  }
+
+  async signIn(
+    signInInput: AdminSignInInput,
+  ): Promise<{ access_token: string }> {
+    const user = await this.findBy({ email: signInInput.email });
+
+    const isPasswordValid = compareSync(signInInput.password, user.password);
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const payload = { sub: user._id, email: user.email };
+
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }

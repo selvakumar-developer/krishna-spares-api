@@ -9,15 +9,15 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { IAppConfig } from 'src/interface/config';
-import { User } from 'src/users/entities/user.entity';
-import { UsersService } from 'src/users/users.service';
+import { AdminUsersService } from './admin-users.service';
+import { AdminUser } from './entities/admin-user.entity';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class AdminAuthGuard implements CanActivate {
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService<IAppConfig>,
-    private userService: UsersService,
+    private adminUsersService: AdminUsersService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -27,13 +27,15 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException();
     }
     try {
-      const payload: User = await this.jwtService.verifyAsync(token, {
+      const payload: AdminUser = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<IAppConfig['JWT_SECRET']>('JWT_SECRET'),
       });
-      const user = await this.userService.findBy({ email: payload.email });
+      const user = await this.adminUsersService.findBy({
+        email: payload.email,
+      });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      request['user'] = user;
+      request['adminUser'] = user;
     } catch {
       throw new UnauthorizedException();
     }

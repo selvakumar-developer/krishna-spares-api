@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import * as bcrypt from 'bcrypt';
 import { FilterQuery, Model } from 'mongoose';
+import { hash } from 'src/utils';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
@@ -17,7 +17,7 @@ export class UsersService {
 
   async create(createUserInput: CreateUserInput) {
     try {
-      const passwordHash = await bcrypt.hash(createUserInput.passwordHash, 10);
+      const passwordHash = hash(createUserInput.passwordHash);
 
       const createUserResponse = await this.userModel.create({
         ...createUserInput,
