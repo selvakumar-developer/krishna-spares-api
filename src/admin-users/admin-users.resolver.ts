@@ -46,4 +46,11 @@ export class AdminUsersResolver {
   adminUserSignIn(@Args('adminUserSignIn') signInInput: AdminSignInInput) {
     return this.adminUsersService.signIn(signInInput);
   }
+
+  @Mutation(() => AdminSignInResponse)
+  verifyAdminRefreshToken(
+    @Args('verifyAdminRefreshToken') refreshToken: string,
+  ) {
+    return this.adminUsersService.refreshToken(refreshToken);
+  }
 }

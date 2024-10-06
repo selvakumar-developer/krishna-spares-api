@@ -17,7 +17,9 @@ import { AdminUser, AdminUserSchema } from './entities/admin-user.entity';
       useFactory: async (configService: ConfigService<IAppConfig>) => ({
         global: true,
         secret: configService.get<IAppConfig['JWT_SECRET']>('JWT_SECRET'),
-        signOptions: { expiresIn: '60s' },
+        signOptions: {
+          expiresIn: configService.get('ADMIN_USER_ACCESS_TOKEN_EXP_TIME'),
+        },
       }),
       inject: [ConfigService],
     }),
