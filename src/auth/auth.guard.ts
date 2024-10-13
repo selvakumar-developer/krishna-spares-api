@@ -28,7 +28,7 @@ export class AuthGuard implements CanActivate {
     }
     try {
       const payload: User = await this.jwtService.verifyAsync(token, {
-        secret: this.configService.get<IAppConfig['JWT_SECRET']>('JWT_SECRET'),
+        secret: this.configService.get('USER_ACCESS_TOKEN_JWT_SECRET'),
       });
       const user = await this.userService.findBy({ email: payload.email });
       // 💡 We're assigning the payload to the request object here
