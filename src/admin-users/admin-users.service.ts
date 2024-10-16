@@ -12,6 +12,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { compareSync } from 'bcrypt';
 import { FilterQuery, Model } from 'mongoose';
+import { IAppConfig } from 'src/interface/config';
 import { AdminSignInInput } from './dto/admin-sign-in-input';
 import { CreateAdminUserInput } from './dto/create-admin-user.input';
 import { UpdateAdminUserInput } from './dto/update-admin-user.input';
@@ -25,7 +26,7 @@ import {
 export class AdminUsersService implements OnModuleInit {
   constructor(
     @InjectModel(AdminUser.name) private adminUserModel: Model<AdminUser>,
-    private configService: ConfigService,
+    private configService: ConfigService<IAppConfig>,
     private jwtService: JwtService,
   ) {}
 
@@ -122,7 +123,7 @@ export class AdminUsersService implements OnModuleInit {
 
   async signIn(
     signInInput: AdminSignInInput,
-  ): Promise<{ access_token: string }> {
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.findBy({ email: signInInput.email });
 
     const isPasswordValid = compareSync(signInInput.password, user.password);
@@ -134,7 +135,30 @@ export class AdminUsersService implements OnModuleInit {
     const payload = { sub: user._id, email: user.email };
 
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      accessToken: this.jwtService.sign(payload),
+      refreshToken: this.jwtService.sign(payload, {
+        expiresIn: this.configService.get('ADMIN_USER_REFRESH_TOKEN_EXP_TIME'),
+      }),
     };
+  }
+
+  async refreshToken(
+    refreshToken: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    try {
+      const payload = this.jwtService.verify(refreshToken);
+
+      const newPayload = { sub: payload.sub, email: payload.email };
+      return {
+        accessToken: this.jwtService.sign(newPayload),
+        refreshToken: this.jwtService.sign(newPayload, {
+          expiresIn: this.configService.get(
+            'ADMIN_USER_REFRESH_TOKEN_EXP_TIME',
+          ),
+        }),
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 }

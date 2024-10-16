@@ -28,7 +28,7 @@ export class AdminAuthGuard implements CanActivate {
     }
     try {
       const payload: AdminUser = await this.jwtService.verifyAsync(token, {
-        secret: this.configService.get<IAppConfig['JWT_SECRET']>('JWT_SECRET'),
+        secret: this.configService.get('ADMIN_ACCESS_TOKEN_JWT_SECRET'),
       });
       const user = await this.adminUsersService.findBy({
         email: payload.email,
