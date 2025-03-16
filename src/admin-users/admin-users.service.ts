@@ -28,7 +28,7 @@ export class AdminUsersService implements OnModuleInit {
     @InjectModel(AdminUser.name) private adminUserModel: Model<AdminUser>,
     private configService: ConfigService<IAppConfig>,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async onModuleInit() {
     Logger.log('Initializing Admin User...');
