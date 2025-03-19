@@ -23,7 +23,7 @@ export class AdminUser {
   @Prop({ unique: true })
   email: string;
 
-  @Field({ description: 'password of the administrator' })
+  @Field({ description: 'password of the administrator', nullable: true })
   @Prop()
   password: string;
 

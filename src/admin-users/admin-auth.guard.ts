@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { GqlExecutionContext } from '@nestjs/graphql';
+import { GqlContextType, GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { IAppConfig } from 'src/interface/config';
@@ -18,7 +18,7 @@ export class AdminAuthGuard implements CanActivate {
     private jwtService: JwtService,
     private configService: ConfigService<IAppConfig>,
     private adminUsersService: AdminUsersService,
-  ) {}
+  ) { }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = this.getRequest(context);
@@ -30,12 +30,12 @@ export class AdminAuthGuard implements CanActivate {
       const payload: AdminUser = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get('ADMIN_ACCESS_TOKEN_JWT_SECRET'),
       });
-      const user = await this.adminUsersService.findBy({
+      const adminUser = await this.adminUsersService.findBy({
         email: payload.email,
       });
       // 💡 We're assigning the payload to the request object here
       // so that we can access it in our route handlers
-      request['adminUser'] = user;
+      request['adminUser'] = adminUser;
     } catch {
       throw new UnauthorizedException();
     }
@@ -51,7 +51,7 @@ export class AdminAuthGuard implements CanActivate {
     if (context.getType() === 'http') {
       // HTTP request (REST)
       return context.switchToHttp().getRequest();
-    } else {
+    } else if (context.getType<GqlContextType>() === 'graphql') {
       // GraphQL request
       const ctx = GqlExecutionContext.create(context);
       return ctx.getContext().req;

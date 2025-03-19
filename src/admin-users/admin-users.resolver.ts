@@ -1,4 +1,8 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Roles } from 'src/decorators/roles.decorators';
+import { RolesGuard } from 'src/guards/roles.guard';
+import { AdminAuthGuard } from './admin-auth.guard';
 import { AdminUsersService } from './admin-users.service';
 import { AdminSignInInput } from './dto/admin-sign-in-input';
 import { AdminSignInResponse } from './dto/admin-sign-in-response';
@@ -8,7 +12,7 @@ import { AdminUser } from './entities/admin-user.entity';
 
 @Resolver(() => AdminUser)
 export class AdminUsersResolver {
-  constructor(private readonly adminUsersService: AdminUsersService) {}
+  constructor(private readonly adminUsersService: AdminUsersService) { }
 
   @Mutation(() => AdminUser)
   createAdminUser(
@@ -18,6 +22,8 @@ export class AdminUsersResolver {
   }
 
   @Query(() => [AdminUser], { name: 'adminUsers' })
+  @UseGuards(AdminAuthGuard, RolesGuard)
+  @Roles(['ADMIN'])
   findAll() {
     return this.adminUsersService.findAll();
   }
@@ -43,11 +49,13 @@ export class AdminUsersResolver {
   }
 
   @Mutation(() => AdminSignInResponse)
+  @UseGuards()
   adminUserSignIn(@Args('adminUserSignIn') signInInput: AdminSignInInput) {
     return this.adminUsersService.signIn(signInInput);
   }
 
   @Mutation(() => AdminSignInResponse)
+  @UseGuards()
   verifyAdminRefreshToken(
     @Args('verifyAdminRefreshToken') refreshToken: string,
   ) {
