@@ -10,5 +10,6 @@ import { FilesService } from './files.service';
       { name: File.name, schema: FileSchema }
     ]),
   ], providers: [FilesResolver, FilesService],
+  exports: [FilesService],
 })
 export class FilesModule { }

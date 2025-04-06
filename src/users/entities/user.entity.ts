@@ -1,35 +1,9 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
-@ObjectType()
-class Address {
-  @Field({ description: 'Street Name for the address' })
-  @Prop()
-  street: string;
+import { File } from 'src/files/entities/file.entity';
+import Address from './address.entity';
 
-  @Field({ description: 'City name for the address' })
-  @Prop()
-  city: string;
-
-  @Field({ description: 'State name for the address' })
-  @Prop()
-  state: string;
-
-  @Field({ description: 'Postal code for the address' })
-  @Prop()
-  postalCode: string;
-
-  @Field({ description: 'Country name for the address' })
-  @Prop()
-  country: string;
-
-  @Field({
-    description:
-      'To maintain whether the address is deleted or not (soft delete)',
-  })
-  @Prop()
-  isDeleted: boolean;
-}
 @ObjectType()
 @Schema({ timestamps: true })
 export class User {
@@ -49,9 +23,9 @@ export class User {
   @Prop()
   mobileNumber: string;
 
-  @Field({ description: 'Profile picture URL of the user' })
-  @Prop()
-  profilePictureUrl: string;
+  @Field(() => File, { description: 'Profile picture ID of the user' })
+  @Prop({ type: Types.ObjectId, ref: File.name })
+  profilePicture: Types.ObjectId;
 
   @Field(() => [Address], { description: 'List of addresses of the user' })
   @Prop({ type: [Address] })

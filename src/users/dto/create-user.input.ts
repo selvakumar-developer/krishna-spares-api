@@ -9,6 +9,7 @@ import {
   Length,
   ValidateNested,
 } from 'class-validator';
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 @InputType()
 export class CreateUserInput {
   @Field({ description: 'Name of the user' })
@@ -20,17 +21,17 @@ export class CreateUserInput {
   @IsEmail({}, { message: 'Invalid email format' })
   email: string;
 
-  @Field({ description: 'Encrypted password of the user' })
+  @Field({ description: 'Password of the user' })
   @IsNotEmpty({ message: 'Password is required' })
-  passwordHash: string;
+  password: string;
 
   @Field({ description: 'Mobile Number of the user' })
   @IsNotEmpty({ message: 'Mobile Number is required' })
   @IsMobilePhone('en-IN', {}, { message: 'Invalid Mobile Number' })
   mobileNumber: string;
 
-  @Field({ description: 'Profile picture URL of the user' })
-  profilePictureUrl: string;
+  @Field(() => GraphQLUpload, { description: 'Profile picture of the user' })
+  profilePicture: FileUpload;
 
   @Field(() => [CreateAddressInput], { description: 'Addresses of the user' })
   @IsArray({ message: 'Addresses must be an array' })

@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
+import { FilesService } from 'src/files/files.service';
+import { SupabaseBucketFolder } from 'src/interface/supabase-bucket';
 import { hash } from 'src/utils';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
@@ -13,15 +15,17 @@ import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(@InjectModel(User.name) private userModel: Model<User>, private readonly fileService: FilesService) { }
 
   async create(createUserInput: CreateUserInput) {
     try {
-      const passwordHash = hash(createUserInput.passwordHash);
+      const passwordHash = hash(createUserInput.password);
+      const fileUploadResponse = await this.fileService.uploadFile(createUserInput.profilePicture, SupabaseBucketFolder.USER_PROFILE_PICTURE)
 
       const createUserResponse = await this.userModel.create({
         ...createUserInput,
         passwordHash,
+        profilePicture: fileUploadResponse._id
       });
       return createUserResponse;
     } catch (error) {
