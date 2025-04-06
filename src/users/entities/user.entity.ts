@@ -23,7 +23,7 @@ export class User {
   @Prop()
   mobileNumber: string;
 
-  @Field(() => File, { description: 'Profile picture URL of the user' })
+  @Field(() => File, { description: 'Profile picture ID of the user' })
   @Prop({ type: Types.ObjectId, ref: File.name })
   profilePicture: Types.ObjectId;
 

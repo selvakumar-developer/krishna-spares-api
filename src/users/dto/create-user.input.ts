@@ -21,7 +21,7 @@ export class CreateUserInput {
   @IsEmail({}, { message: 'Invalid email format' })
   email: string;
 
-  @Field({ description: 'Encrypted password of the user' })
+  @Field({ description: 'Password of the user' })
   @IsNotEmpty({ message: 'Password is required' })
   password: string;
 
@@ -30,7 +30,7 @@ export class CreateUserInput {
   @IsMobilePhone('en-IN', {}, { message: 'Invalid Mobile Number' })
   mobileNumber: string;
 
-  @Field(() => GraphQLUpload, { description: 'Profile picture URL of the user', nullable: true })
+  @Field(() => GraphQLUpload, { description: 'Profile picture of the user', nullable: true })
   profilePicture?: FileUpload;
 
   @Field(() => [CreateAddressInput], { description: 'Addresses of the user' })
