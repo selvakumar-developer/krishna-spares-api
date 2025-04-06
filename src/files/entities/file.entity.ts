@@ -1,30 +1,41 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
-@ObjectType()
+@ObjectType('FileEntity')
 @Schema({ timestamps: true })
 export class File {
-  @Prop({ required: true })
+
+  @Field(() => ID)
+  _id: Types.ObjectId; // Mongoose ObjectId, exposed as ID in GraphQL
+
+  @Field({ description: 'Name of the file' })
+  @Prop()
   filename: string;
 
-  @Prop({ required: true })
+  @Field({ description: 'Original name of the file' })
+  @Prop()
   originalName: string;
 
-  @Prop({ required: true })
+  @Field({ description: 'MIME type of the file' })
+  @Prop()
   mimeType: string;
 
-  @Prop({ required: true })
+  @Field({ description: 'Size of the file in bytes' })
+  @Prop()
   size: number;
 
-  @Prop({ required: true })
+  @Field({ description: 'URL of the file' })
+  @Prop()
   url: string;
 
-  @Field(() => Date, { nullable: true })
-  createdAt?: Date;
+  @Field(() => Date)
+  @Prop()
+  createdAt: Date;
 
-  @Field(() => Date, { nullable: true })
-  updatedAt?: Date;
+  @Field(() => Date)
+  @Prop()
+  updatedAt: Date;
 }
 
 export type FileDocument = File & Document;
