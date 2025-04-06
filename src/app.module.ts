@@ -4,11 +4,13 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
+import { GraphQLUpload } from 'graphql-upload-ts';
 import { AdminUsersModule } from './admin-users/admin-users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import configuration from './config/configuration';
+import { FilesModule } from './files/files.module';
 import { IAppConfig } from './interface/config';
 import { UsersModule } from './users/users.module';
 
@@ -30,7 +32,11 @@ import { UsersModule } from './users/users.module';
       autoSchemaFile: true,
       plugins: [ApolloServerPluginLandingPageLocalDefault()],
       playground: false,
-      introspection: true
+      introspection: true,
+      csrfPrevention: false,
+      resolvers: {
+        Upload: GraphQLUpload
+      }
       // formatError(formattedError, error) {
       //   return {
 
@@ -41,6 +47,7 @@ import { UsersModule } from './users/users.module';
     UsersModule,
     AuthModule,
     AdminUsersModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
