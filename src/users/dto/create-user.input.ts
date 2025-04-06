@@ -30,8 +30,8 @@ export class CreateUserInput {
   @IsMobilePhone('en-IN', {}, { message: 'Invalid Mobile Number' })
   mobileNumber: string;
 
-  @Field(() => GraphQLUpload, { description: 'Profile picture of the user', nullable: true })
-  profilePicture?: FileUpload;
+  @Field(() => GraphQLUpload, { description: 'Profile picture of the user' })
+  profilePicture: FileUpload;
 
   @Field(() => [CreateAddressInput], { description: 'Addresses of the user' })
   @IsArray({ message: 'Addresses must be an array' })

@@ -1,5 +1,6 @@
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
+import { Types } from 'mongoose';
 import { SupabaseBucketFolder } from 'src/interface/supabase-bucket';
 import { File } from './dto/file.dto';
 import { UpdateFileInput } from './dto/update-file.input';
@@ -23,7 +24,7 @@ export class FilesResolver {
   }
 
   @Query(() => File, { name: 'file' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
+  findOne(@Args('id', { type: () => String }) id: Types.ObjectId) {
     return this.filesService.findOne(id);
   }
 

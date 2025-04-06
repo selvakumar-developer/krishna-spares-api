@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { InjectModel } from '@nestjs/mongoose';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { FileUpload } from 'graphql-upload-ts';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { IAppConfig } from 'src/interface/config';
 import { SupabaseBucketFolder } from 'src/interface/supabase-bucket';
 import { UpdateFileInput } from './dto/update-file.input';
@@ -70,8 +70,8 @@ export class FilesService {
     return `This action returns all files`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} file`;
+  findOne(id: Types.ObjectId) {
+    return this.fileModel.findById(id);
   }
 
   update(id: number, updateFileInput: UpdateFileInput) {
