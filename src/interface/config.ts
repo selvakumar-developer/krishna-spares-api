@@ -1,3 +1,4 @@
+
 export interface IAppConfig {
   PORT: number;
   MONGO_URL: string;
@@ -12,4 +13,7 @@ export interface IAppConfig {
   USER_REFRESH_TOKEN_JWT_SECRET: string;
   USER_ACCESS_TOKEN_EXP_TIME: string;
   USER_REFRESH_TOKEN_EXP_TIME: string;
+  SUPABASE_URL: string;
+  SUPABASE_KEY: string;
+  SUPABASE_BUCKET: string;
 }
