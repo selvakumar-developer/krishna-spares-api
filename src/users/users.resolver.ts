@@ -7,7 +7,7 @@ import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
-
+@UseGuards(AdminAuthGuard)
 @Resolver(() => User)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService, private readonly fileService: FilesService) { }
@@ -19,7 +19,6 @@ export class UsersResolver {
   }
 
   @Query(() => [User], { name: 'users' })
-  @UseGuards(AdminAuthGuard)
   findAll() {
     return this.usersService.findAll();
   }
