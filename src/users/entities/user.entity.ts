@@ -42,7 +42,10 @@ export class User {
   @Field({
     description: 'To maintain whether the user is deleted or not (soft delete)',
   })
-  @Prop()
+  @Prop({
+    default: false,
+    type: Boolean,
+  })
   isDeleted: boolean;
 }
 
