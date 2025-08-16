@@ -15,17 +15,23 @@ import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>, private readonly fileService: FilesService) { }
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private readonly fileService: FilesService,
+  ) {}
 
   async create(createUserInput: CreateUserInput) {
     try {
       const passwordHash = hash(createUserInput.password);
-      const fileUploadResponse = await this.fileService.uploadFile(createUserInput.profilePicture, SupabaseBucketFolder.USER_PROFILE_PICTURE)
+      const fileUploadResponse = await this.fileService.uploadFile(
+        createUserInput.profilePicture,
+        SupabaseBucketFolder.USER_PROFILE_PICTURE,
+      );
 
       const createUserResponse = await this.userModel.create({
         ...createUserInput,
         passwordHash,
-        profilePicture: fileUploadResponse._id
+        profilePicture: fileUploadResponse._id,
       });
       return createUserResponse;
     } catch (error) {
@@ -36,6 +42,40 @@ export class UsersService {
   async findAll() {
     try {
       return await this.userModel.find().exec();
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  async countUsers() {
+    try {
+      return await this.userModel.countDocuments().exec();
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  async findAllWithPagination(page: number = 1, limit: number = 10) {
+    try {
+      const skip = (page - 1) * limit;
+
+      const [users, total] = await Promise.all([
+        this.userModel.find().skip(skip).limit(limit).exec(),
+        this.countUsers(),
+      ]);
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data: users,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalItems: total,
+          itemsPerPage: limit,
+          hasNextPage: page < totalPages,
+          hasPreviousPage: page > 1,
+        },
+      };
     } catch (error) {
       throw new HttpException(error, HttpStatus.FORBIDDEN);
     }
