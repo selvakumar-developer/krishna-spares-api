@@ -1,33 +1,100 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
+import { FilesService } from 'src/files/files.service';
+import { SupabaseBucketFolder } from 'src/interface/supabase-bucket';
+import { hash } from 'src/utils';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(@InjectModel(User.name) private userModel: Model<User>, private readonly fileService: FilesService) { }
 
-  create(createUserInput: CreateUserInput) {
-    console.log('createUserInput: ', createUserInput);
-    return 'This action adds a new user';
+  async create(createUserInput: CreateUserInput) {
+    try {
+      const passwordHash = hash(createUserInput.password);
+      const fileUploadResponse = await this.fileService.uploadFile(createUserInput.profilePicture, SupabaseBucketFolder.USER_PROFILE_PICTURE)
+
+      const createUserResponse = await this.userModel.create({
+        ...createUserInput,
+        passwordHash,
+        profilePicture: fileUploadResponse._id
+      });
+      return createUserResponse;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.FORBIDDEN);
+    }
   }
 
   async findAll() {
-    return await this.userModel.find().exec();
+    try {
+      return await this.userModel.find().exec();
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.FORBIDDEN);
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    try {
+      const user = await this.userModel
+        .findById(id)
+        .select('-passwordHash')
+        .exec();
+      if (!user) {
+        throw new NotFoundException(`User with ID "${id}" not found`);
+      }
+      return user;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.FORBIDDEN);
+    }
   }
 
-  update(id: number, updateUserInput: UpdateUserInput) {
-    console.log('updateUserInput: ', updateUserInput);
-    return `This action updates a #${id} user`;
+  async findBy(filter: FilterQuery<User>) {
+    try {
+      const user = await this.userModel.findOne({ ...filter }).exec();
+      if (!user) {
+        throw new NotFoundException(`User not found`);
+      }
+      return user;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.FORBIDDEN);
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async update(id: string, updateUserInput: UpdateUserInput) {
+    try {
+      const updatedUser = await this.userModel
+        .findByIdAndUpdate(id, updateUserInput, { new: true })
+        .select('-password')
+        .exec();
+      if (!updatedUser) {
+        throw new NotFoundException(`User with ID "${id}" not found`);
+      }
+      return updatedUser;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.FORBIDDEN);
+    }
+  }
+
+  async remove(id: string) {
+    try {
+      const user = await this.userModel.findById(id).exec();
+      if (!user) {
+        throw new NotFoundException(`User with ID "${id}" not found`);
+      }
+      const deletedUser = await user.deleteOne();
+      if (deletedUser.deletedCount > 0) {
+        return user;
+      }
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.FORBIDDEN);
+    }
   }
 }

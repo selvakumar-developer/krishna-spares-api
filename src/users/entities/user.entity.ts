@@ -1,17 +1,15 @@
-import { Field, ID, ObjectType } from '@nestjs/graphql';
+import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Address } from 'src/address/entities/address.entity';
+import { Types } from 'mongoose';
+import { File } from 'src/files/entities/file.entity';
+import Address from './address.entity';
 
 @ObjectType()
-@Schema()
+@Schema({ timestamps: true })
 export class User {
-  @Field(() => ID, { description: 'Unique identifier of the user' })
-  @Prop()
-  _id: string;
-
   @Field({ description: 'Name of the user' })
   @Prop()
-  userName: string;
+  fullName: string;
 
   @Field({ description: 'Email of the user' })
   @Prop()
@@ -25,13 +23,13 @@ export class User {
   @Prop()
   mobileNumber: string;
 
-  @Field({ description: 'Profile picture URL of the user' })
-  @Prop()
-  profilePictureUrl: string;
+  @Field(() => File, { description: 'Profile picture ID of the user' })
+  @Prop({ type: Types.ObjectId, ref: File.name })
+  profilePicture: Types.ObjectId;
 
-  @Field(() => Address, { description: 'Address of the user' })
-  @Prop()
-  address: string;
+  @Field(() => [Address], { description: 'List of addresses of the user' })
+  @Prop({ type: [Address] })
+  address: Types.ObjectId;
 
   @Field({ description: 'Created Date of the user' })
   @Prop()
