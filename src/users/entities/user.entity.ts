@@ -7,6 +7,9 @@ import Address from './address.entity';
 @ObjectType()
 @Schema({ timestamps: true })
 export class User {
+  @Field(() => String, { description: 'MongoDB generated ID' })
+  _id: Types.ObjectId;
+
   @Field({ description: 'Name of the user' })
   @Prop()
   fullName: string;
