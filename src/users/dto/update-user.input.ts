@@ -7,4 +7,7 @@ export class UpdateUserInput extends PartialType(CreateUserInput) {
   @Field()
   @IsMongoId({ message: 'Invalid Id' })
   id: string;
+
+  @Field()
+  keepExistingImage: boolean;
 }

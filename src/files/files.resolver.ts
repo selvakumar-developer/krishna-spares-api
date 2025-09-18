@@ -1,4 +1,4 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { FileUpload, GraphQLUpload } from 'graphql-upload-ts';
 import { Types } from 'mongoose';
 import { SupabaseBucketFolder } from 'src/interface/supabase-bucket';
@@ -8,14 +8,17 @@ import { FilesService } from './files.service';
 
 @Resolver(() => File)
 export class FilesResolver {
-  constructor(private readonly filesService: FilesService) { }
+  constructor(private readonly filesService: FilesService) {}
 
   @Mutation(() => File)
   async uploadFile(
     @Args({ name: 'uploadFile', type: () => GraphQLUpload })
     file: FileUpload,
   ): Promise<File> {
-    return this.filesService.uploadFile(file, SupabaseBucketFolder.USER_PROFILE_PICTURE);
+    return this.filesService.uploadFile(
+      file,
+      SupabaseBucketFolder.USER_PROFILE_PICTURE,
+    );
   }
 
   @Query(() => [File], { name: 'files' })
@@ -34,7 +37,7 @@ export class FilesResolver {
   }
 
   @Mutation(() => File)
-  removeFile(@Args('id', { type: () => Int }) id: number) {
+  removeFile(@Args('id', { type: () => String }) id: Types.ObjectId) {
     return this.filesService.remove(id);
   }
 }
