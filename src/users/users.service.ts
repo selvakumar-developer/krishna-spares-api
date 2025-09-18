@@ -110,8 +110,29 @@ export class UsersService {
 
   async update(id: string, updateUserInput: UpdateUserInput) {
     try {
+      const { keepExistingImage, profilePicture, ...restUpdateInput } =
+        updateUserInput;
+
+      let updateData: any = { ...restUpdateInput };
+
+      if (!keepExistingImage && profilePicture) {
+        // Get existing user to find current profile picture
+        const existingUser = await this.userModel.findById(id);
+        if (existingUser?.profilePicture) {
+          // Delete existing profile picture
+          await this.fileService.remove(existingUser.profilePicture._id);
+        }
+
+        // Upload new profile picture
+        const fileUploadResponse = await this.fileService.uploadFile(
+          profilePicture,
+          SupabaseBucketFolder.USER_PROFILE_PICTURE,
+        );
+        updateData.profilePicture = fileUploadResponse._id;
+      }
+
       const updatedUser = await this.userModel
-        .findByIdAndUpdate(id, updateUserInput, { new: true })
+        .findByIdAndUpdate(id, updateData, { new: true })
         .select('-password')
         .exec();
       if (!updatedUser) {

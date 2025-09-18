@@ -24,19 +24,21 @@ export class FilesService {
     this.bucketName = configService.get('SUPABASE_BUCKET');
   }
 
-  async uploadFile(file: FileUpload, folderName: SupabaseBucketFolder): Promise<File> {
+  async uploadFile(
+    file: FileUpload,
+    folderName: SupabaseBucketFolder,
+  ): Promise<File> {
     const { createReadStream, filename, mimetype } = await file;
 
     // Convert the file stream to a buffer
     const buffer = await new Promise<Buffer>((resolve, reject) => {
-      const chunks: Buffer[] = [];
+      const chunks: Uint8Array[] = [];
       const stream = createReadStream();
 
-      stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+      stream.on('data', (chunk: Uint8Array) => chunks.push(chunk));
       stream.on('error', reject);
       stream.on('end', () => resolve(Buffer.concat(chunks)));
     });
-
     // Upload to Supabase Storage
     const uniqueFilename = `${Date.now()}_${filename}`;
     const { data, error } = await this.supabase.storage
@@ -78,7 +80,31 @@ export class FilesService {
     return `This action updates a #${id} file`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} file`;
+  async remove(id: Types.ObjectId) {
+    // Find the file first to get the filename
+    const file = await this.fileModel.findById(id);
+    if (!file) {
+      throw new Error('File not found');
+    }
+
+    // Extract folder name from the URL path
+    const urlPath = new URL(file.url).pathname;
+    // Decode the URL path to handle special characters properly
+    const decodedPath = decodeURIComponent(urlPath);
+    const pathWithoutBucket = decodedPath.split('/').slice(6).join('/');
+
+    // Delete from Supabase
+    const { error } = await this.supabase.storage.from(this.bucketName).remove([
+      pathWithoutBucket, // Use the extracted path
+    ]);
+
+    if (error) {
+      throw new Error(`Failed to delete file from storage: ${error.message}`);
+    }
+
+    // Delete from MongoDB
+    await this.fileModel.findByIdAndDelete(id);
+
+    return file;
   }
 }
