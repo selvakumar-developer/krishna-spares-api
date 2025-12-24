@@ -15,6 +15,14 @@ export class Supplier {
   @Field({ description: 'Mobile Number of the supplier' })
   @Prop()
   mobileNumber: string;
+
+  @Field({ description: 'Created Date of the supplier' })
+  @Prop()
+  createdAt: Date;
+
+  @Field({ description: 'Updated Date of the supplier' })
+  @Prop()
+  updatedAt: Date;
 }
 
 export type SupplierDocument = Supplier & Document;
