@@ -8,7 +8,7 @@ export class Supplier {
   @Field(() => String, { description: 'MongoDB generated ID' })
   _id: Types.ObjectId;
 
-  @Field({ description: 'Name of the supplier' })
+  @Field({ description: 'Full Name of the supplier' })
   @Prop()
   fullName: string;
 
