@@ -7,12 +7,12 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { AdminAuthGuard } from 'src/admin-users/admin-auth.guard';
 import { PaginationArgs } from 'src/common/dto/pagination.dto';
-import { File } from 'src/files/entities/file.entity';
-import { FilesService } from 'src/files/files.service';
+import { AdminAuthGuard } from 'src/modules/admin-users/admin-auth.guard';
+import { File } from 'src/modules/files/entities/file.entity';
+import { FilesService } from 'src/modules/files/files.service';
 import { CreateUserInput } from './dto/create-user.input';
-import { PaginatedUsersResponse } from './dto/paginated-user-response';
+import { PaginatedUsersResponse } from './dto/paginated-users-response';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';

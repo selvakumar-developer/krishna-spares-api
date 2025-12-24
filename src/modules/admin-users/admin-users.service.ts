@@ -25,10 +25,11 @@ import {
 @Injectable()
 export class AdminUsersService implements OnModuleInit {
   constructor(
-    @InjectModel(AdminUser.name) private adminUserModel: Model<AdminUser>,
+    @InjectModel(AdminUser.name)
+    private adminUserModel: Model<AdminUserDocument>,
     private configService: ConfigService<IAppConfig>,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async onModuleInit() {
     Logger.log('Initializing Admin User...');
