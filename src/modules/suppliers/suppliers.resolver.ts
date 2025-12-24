@@ -25,7 +25,7 @@ export class SuppliersResolver {
     return this.suppliersService.findAll();
   }
 
-  @Query(() => PaginatedSuppliersResponse, { name: 'usersPaginated' })
+  @Query(() => PaginatedSuppliersResponse, { name: 'suppliersPaginated' })
   async findAllWithPagination(
     @Args('paginationArgs', { type: () => PaginationArgs, nullable: true })
     paginationArgs: PaginationArgs = { page: 1, limit: 10 },
