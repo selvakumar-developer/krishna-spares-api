@@ -5,14 +5,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GraphQLUpload } from 'graphql-upload-ts';
-import { AdminUsersModule } from './admin-users/admin-users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import configuration from './config/configuration';
-import { FilesModule } from './files/files.module';
 import { IAppConfig } from './interface/config';
-import { UsersModule } from './users/users.module';
+import { AdminUsersModule } from './modules/admin-users/admin-users.module';
+import { FilesModule } from './modules/files/files.module';
+import { SuppliersModule } from './modules/suppliers/suppliers.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -35,8 +36,8 @@ import { UsersModule } from './users/users.module';
       introspection: true,
       csrfPrevention: false,
       resolvers: {
-        Upload: GraphQLUpload
-      }
+        Upload: GraphQLUpload,
+      },
       // formatError(formattedError, error) {
       //   return {
 
@@ -48,8 +49,9 @@ import { UsersModule } from './users/users.module';
     AuthModule,
     AdminUsersModule,
     FilesModule,
+    SuppliersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

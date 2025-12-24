@@ -6,17 +6,17 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { FilterQuery, Model } from 'mongoose';
-import { FilesService } from 'src/files/files.service';
 import { SupabaseBucketFolder } from 'src/interface/supabase-bucket';
+import { FilesService } from 'src/modules/files/files.service';
 import { hash } from 'src/utils';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
-import { User } from './entities/user.entity';
+import { User, UserDocument } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
     private readonly fileService: FilesService,
   ) {}
 

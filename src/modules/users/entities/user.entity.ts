@@ -1,7 +1,7 @@
 import { Field, ObjectType } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
-import { File } from 'src/files/entities/file.entity';
+import { File } from 'src/modules/files/entities/file.entity';
 import Address from './address.entity';
 
 @ObjectType()
